@@ -1,8 +1,8 @@
 #include "notify_routines.h"
 
-void notify_routines::create_process(PEPROCESS, HANDLE process_id, PPS_CREATE_NOTIFY_INFO create_info)
+void notify_routines::create_process(HANDLE, HANDLE process_id, BOOLEAN create)
 {
-	if (create_info) {
+	if (create) {
 		g_new_processes_cache->add_process(HandleToULong(process_id));
 	}
 }
