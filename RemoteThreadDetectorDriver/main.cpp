@@ -60,7 +60,7 @@ extern "C" NTSTATUS DriverEntry(PDRIVER_OBJECT driver_object, PUNICODE_STRING)
 		return status;
 	}
 
-	status = ::PsSetCreateProcessNotifyRoutineEx(notify_routines::create_process, FALSE);
+	status = ::PsSetCreateProcessNotifyRoutine(notify_routines::create_process, FALSE);
 
 	if (!NT_SUCCESS(status)) {
 		::IoDeleteDevice(device_object);
@@ -76,7 +76,7 @@ extern "C" NTSTATUS DriverEntry(PDRIVER_OBJECT driver_object, PUNICODE_STRING)
 	if (!NT_SUCCESS(status)) {
 		::IoDeleteDevice(device_object);
 		::IoDeleteSymbolicLink(&symbolic_link);
-		::PsSetCreateProcessNotifyRoutineEx(notify_routines::create_process, TRUE);
+		::PsSetCreateProcessNotifyRoutine(notify_routines::create_process, TRUE);
 
 		KdPrint(("[-] Failed to create a thread notify routine.\n"));
 
@@ -88,7 +88,7 @@ extern "C" NTSTATUS DriverEntry(PDRIVER_OBJECT driver_object, PUNICODE_STRING)
 	if (!g_remote_thread_creation_list) {
 		::IoDeleteDevice(device_object);
 		::IoDeleteSymbolicLink(&symbolic_link);
-		::PsSetCreateProcessNotifyRoutineEx(notify_routines::create_process, TRUE);
+		::PsSetCreateProcessNotifyRoutine(notify_routines::create_process, TRUE);
 		::PsRemoveCreateThreadNotifyRoutine(notify_routines::create_thread);
 
 		KdPrint(("[-] Failed to create a remote thread creation list.\n"));
@@ -101,7 +101,7 @@ extern "C" NTSTATUS DriverEntry(PDRIVER_OBJECT driver_object, PUNICODE_STRING)
 	if (!g_new_processes_cache) {
 		::IoDeleteDevice(device_object);
 		::IoDeleteSymbolicLink(&symbolic_link);
-		::PsSetCreateProcessNotifyRoutineEx(notify_routines::create_process, TRUE);
+		::PsSetCreateProcessNotifyRoutine(notify_routines::create_process, TRUE);
 		::PsRemoveCreateThreadNotifyRoutine(notify_routines::create_thread);
 
 		delete g_remote_thread_creation_list;
@@ -124,7 +124,7 @@ void driver_unload(PDRIVER_OBJECT driver_object)
 	::IoDeleteDevice(driver_object->DeviceObject);
 	::IoDeleteSymbolicLink(&symbolic_link);
 
-	::PsSetCreateProcessNotifyRoutineEx(notify_routines::create_process, TRUE);
+	::PsSetCreateProcessNotifyRoutine(notify_routines::create_process, TRUE);
 	::PsRemoveCreateThreadNotifyRoutine(notify_routines::create_thread);
 
 	delete g_remote_thread_creation_list;
