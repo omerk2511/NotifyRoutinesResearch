@@ -8,7 +8,8 @@
 
 void driver_unload(PDRIVER_OBJECT driver_object);
 
-NewProcessesList* g_new_processes_list;
+NewProcessesList* g_new_processes_list = nullptr;
+volatile LONG64 g_apc_count = 0;
 
 extern "C" NTSTATUS DriverEntry(PDRIVER_OBJECT driver_object, PUNICODE_STRING)
 {
@@ -54,6 +55,8 @@ void driver_unload(PDRIVER_OBJECT)
 	::PsRemoveCreateThreadNotifyRoutine(notify_routines::create_thread);
 
 	delete g_new_processes_list;
+
+	while (g_apc_count > 0);
 
 	KdPrint(("[+] Unloaded RemoteThreadDetector successfully.\n"));
 }

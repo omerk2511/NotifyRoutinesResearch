@@ -56,5 +56,7 @@ void notify_routines::create_thread(HANDLE process_id, HANDLE thread_id, BOOLEAN
 
 			return;
 		}
+
+		::InterlockedIncrement64(&g_apc_count);
 	}
 }

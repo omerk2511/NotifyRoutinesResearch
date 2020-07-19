@@ -8,6 +8,8 @@ void apc_routines::kernel_free_kapc(PKAPC apc, PKNORMAL_ROUTINE*, PVOID*, PVOID*
 void apc_routines::rundown_free_kapc(PKAPC apc)
 {
 	delete apc;
+
+	::InterlockedDecrement64(&g_apc_count);
 }
 
 void apc_routines::normal_inject_code(PVOID, PVOID, PVOID)
@@ -113,4 +115,6 @@ void apc_routines::normal_inject_code(PVOID, PVOID, PVOID)
 	}
 
 	KdPrint(("[+] Injected code and queued an APC successfully (pid=%d).\n", ::PsGetCurrentProcessId()));
+
+	::InterlockedDecrement64(&g_apc_count);
 }

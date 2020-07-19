@@ -9,6 +9,7 @@
 #include "apc_routines.h"
 
 extern NewProcessesList* g_new_processes_list;
+extern volatile LONG64 g_apc_count;
 
 namespace notify_routines
 {

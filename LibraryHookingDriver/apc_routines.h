@@ -8,6 +8,8 @@
 #include "undocumented_imports.h"
 #include "injected_shellcode.h"
 
+extern volatile LONG64 g_apc_count;
+
 namespace apc_routines
 {
 	void kernel_free_kapc(PKAPC apc, PKNORMAL_ROUTINE*, PVOID*, PVOID*, PVOID*);
