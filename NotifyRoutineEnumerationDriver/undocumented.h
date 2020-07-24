@@ -6,7 +6,7 @@ namespace undocumented
 {
 	struct PSP_CALLBACK_OBJECT {
 		EX_RUNDOWN_REF rundown_protection;
-		PVOID notify_routine;
-		PVOID context;
+		void* notify_routine;
+		void* context;
 	};
 }

@@ -45,25 +45,22 @@ undocumented::PSP_CALLBACK_OBJECT** helpers::find_PspCreateThreadNotifyRoutine()
 		return nullptr;
 	}
 
-	UNICODE_STRING ntos_name = RTL_CONSTANT_STRING(L"ntoskrnl.exe");
+	char ntos_name[] = "ntoskrnl.exe";
 	void* ntos_base = nullptr;
 
 	for (size_t i = 0; i < modules_amount; i++) {
 		auto module = &modules[i];
+		auto module_name = reinterpret_cast<char*>(module->FullPathName) + module->FileNameOffset;
 
-		UNICODE_STRING module_name;
-		::RtlInitUnicodeString(&module_name, reinterpret_cast<PCWSTR>(
-			reinterpret_cast<char*>(module) + module->FileNameOffset));
+		auto equal_bytes = ::RtlCompareMemory(ntos_name, module_name, sizeof(ntos_name));
 
-		auto is_ntos = ::RtlCompareUnicodeString(&module_name, &ntos_name, false);
-
-		if (is_ntos) {
+		if (equal_bytes == sizeof(ntos_name)) {
 			ntos_base = module->BasicInfo.ImageBase;
 			break;
 		}
 	}
 
-	::ExFreePoolWithTag(modules, config::kDriverTag);
+	delete modules;
 
 	if (!ntos_base) {
 		KdPrint(("[-] Failed finding PspCreateThreadNotifyRoutine: could not find ntoskrnl.exe.\n"));
@@ -164,4 +161,95 @@ undocumented::PSP_CALLBACK_OBJECT** helpers::find_PspCreateThreadNotifyRoutine()
 	delete test_callback;
 
 	return PspCreateThreadNotifyRoutine;
+}
+
+void helpers::enumerate_create_thread_notify_routines(undocumented::PSP_CALLBACK_OBJECT** PspCreateThreadNotifyRoutine)
+{
+	for (auto i = 0; i < 64; i++) {
+		auto callback = reinterpret_cast<undocumented::PSP_CALLBACK_OBJECT*>(
+			reinterpret_cast<ULONG64>(PspCreateThreadNotifyRoutine[i]) & 0xfffffffffffffff0);
+
+		if (callback) {
+			if (::ExAcquireRundownProtection(&callback->rundown_protection)) {
+				char* driver_name = helpers::get_name_of_owning_driver(callback->notify_routine);
+
+				if (driver_name) {
+					KdPrint(("#%d - Create Thread Notify Routine @0x%p (%s).\n", i + 1, callback->notify_routine, driver_name));
+					delete driver_name;
+				} else {
+					KdPrint(("#%d - Create Thread Notify Routine @0x%p.\n", i + 1, callback->notify_routine));
+				}
+
+				::ExReleaseRundownProtection(&callback->rundown_protection);
+			}
+		}
+	}
+}
+
+char* helpers::get_name_of_owning_driver(void* address)
+{
+	ULONG modules_size{ };
+
+	auto status = ::AuxKlibQueryModuleInformation(
+		&modules_size,
+		sizeof(AUX_MODULE_EXTENDED_INFO),
+		nullptr
+	);
+
+	if (!NT_SUCCESS(status)) {
+		return nullptr;
+	}
+
+	if (modules_size == 0) {
+		return nullptr;
+	}
+
+	auto modules = reinterpret_cast<AUX_MODULE_EXTENDED_INFO*>(
+		::ExAllocatePoolWithTag(PagedPool, modules_size, config::kDriverTag));
+
+	auto modules_amount = modules_size / sizeof(AUX_MODULE_EXTENDED_INFO);
+
+	if (!modules) {
+		return nullptr;
+	}
+
+	RtlZeroMemory(modules, modules_size);
+
+	status = ::AuxKlibQueryModuleInformation(
+		&modules_size,
+		sizeof(AUX_MODULE_EXTENDED_INFO),
+		modules
+	);
+
+	if (!NT_SUCCESS(status)) {
+		return nullptr;
+	}
+
+	char* driver_name = nullptr;
+
+	for (size_t i = 0; i < modules_amount; i++) {
+		auto module = &modules[i];
+
+		auto module_base = reinterpret_cast<void*>(module->BasicInfo.ImageBase);
+		auto module_end = reinterpret_cast<void*>(reinterpret_cast<char*>(module_base) + module->ImageSize);
+
+		if (address >= module_base && address < module_end) {
+			driver_name = reinterpret_cast<char*>(
+				::ExAllocatePoolWithTag(PagedPool, AUX_KLIB_MODULE_PATH_LEN, config::kDriverTag));
+			RtlZeroMemory(driver_name, AUX_KLIB_MODULE_PATH_LEN);
+
+			if (driver_name) {
+				auto module_name = reinterpret_cast<char*>(module->FullPathName) + module->FileNameOffset;
+				auto module_name_size = AUX_KLIB_MODULE_PATH_LEN - module->FileNameOffset;
+
+				::memcpy_s(driver_name, module_name_size, module_name, module_name_size);
+			}
+
+			break;
+		}
+	}
+
+	::ExFreePoolWithTag(modules, config::kDriverTag);
+
+	return driver_name;
 }

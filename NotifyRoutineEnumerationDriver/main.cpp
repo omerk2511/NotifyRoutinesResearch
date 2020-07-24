@@ -31,6 +31,8 @@ extern "C" NTSTATUS DriverEntry(PDRIVER_OBJECT driver_object, PUNICODE_STRING)
 
 	KdPrint(("PspCreateThreadNotifyRoutine is @0x%p.\n", g_PspCreateThreadNotifyRoutine));
 
+	helpers::enumerate_create_thread_notify_routines(g_PspCreateThreadNotifyRoutine);
+
 	KdPrint(("[+] Loaded NotifyRoutineEnumerationDriver successfully.\n"));
 
 	return STATUS_SUCCESS;
