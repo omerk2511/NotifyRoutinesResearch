@@ -42,6 +42,8 @@ void notify_routines::create_thread(HANDLE process_id, HANDLE thread_id, BOOLEAN
 			nullptr
 		);
 
+		::InterlockedIncrement64(&g_apc_count);
+
 		auto inserted = ::KeInsertQueueApc(
 			apc,
 			nullptr,
@@ -51,12 +53,11 @@ void notify_routines::create_thread(HANDLE process_id, HANDLE thread_id, BOOLEAN
 
 		if (!inserted) {
 			delete apc;
+			::InterlockedDecrement64(&g_apc_count);
 
 			KdPrint(("[-] Could not insert a kernel APC.\n"));
 
 			return;
 		}
-
-		::InterlockedIncrement64(&g_apc_count);
 	}
 }
