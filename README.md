@@ -1,7 +1,16 @@
 # Notify Routines Research
 A research project about Windows notify routines.
 
+The full research paper is at:
+- English - TBD
+- Hebrew - TBD
+
 ## Projects
+1. **Remote Thread Shellcode Injector** - A basic code injector which injects shellcode to a remote process using CreateRemoteThread.
+1. **Remote Thread Detector Driver** - A driver that detects remote thread creations.
+1. **Library Hooking Driver & Dll** - A driver that hooks library functions in every new process using DLL injection from the kernel.
+1. **Notify Routine Enumeration Driver** - A driver that enumerates all the (create thread) notify routines currenty registered in the system.
+1. **Notify Routine Hooking Driver** - A driver that hooks (create thread) notify routine and bypasses the LibraryHookingDriver.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
