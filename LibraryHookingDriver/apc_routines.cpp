@@ -9,7 +9,7 @@ void apc_routines::rundown_free_kapc(PKAPC apc)
 {
 	delete apc;
 
-	::InterlockedDecrement64(&g_apc_count);
+	::ExReleaseRundownProtection(&g_rundown_protection);
 }
 
 void apc_routines::normal_inject_code(PVOID, PVOID, PVOID)
@@ -27,6 +27,8 @@ void apc_routines::normal_inject_code(PVOID, PVOID, PVOID)
 	);
 
 	if (!NT_SUCCESS(status)) {
+		::ExReleaseRundownProtection(&g_rundown_protection);
+
 		KdPrint(("[-] Could not allocate memory in new process: 0x%p.\n", status));
 
 		return;
@@ -52,6 +54,8 @@ void apc_routines::normal_inject_code(PVOID, PVOID, PVOID)
 			MEM_FREE | MEM_RELEASE
 		);
 
+		::ExReleaseRundownProtection(&g_rundown_protection);
+
 		KdPrint(("[-] Could not protect virtual memory: 0x%p.\n", status));
 
 		return;
@@ -75,6 +79,8 @@ void apc_routines::normal_inject_code(PVOID, PVOID, PVOID)
 			MEM_FREE | MEM_RELEASE
 		);
 
+		::ExReleaseRundownProtection(&g_rundown_protection);
+
 		KdPrint(("[-] Could not protect virtual memory: 0x%p.\n", status));
 
 		return;
@@ -83,6 +89,8 @@ void apc_routines::normal_inject_code(PVOID, PVOID, PVOID)
 	PKAPC apc = new (NonPagedPool, config::kDriverTag) KAPC;
 
 	if (!apc) {
+		::ExReleaseRundownProtection(&g_rundown_protection);
+
 		KdPrint(("[-] Could not queue a user APC due to insufficient memory.\n"));
 
 		return;
@@ -108,6 +116,7 @@ void apc_routines::normal_inject_code(PVOID, PVOID, PVOID)
 
 	if (!inserted) {
 		delete apc;
+		::ExReleaseRundownProtection(&g_rundown_protection);
 
 		KdPrint(("[-] Could not insert a user APC.\n"));
 
@@ -116,5 +125,5 @@ void apc_routines::normal_inject_code(PVOID, PVOID, PVOID)
 
 	KdPrint(("[+] Injected code and queued an APC successfully (pid=%d).\n", ::PsGetCurrentProcessId()));
 
-	::InterlockedDecrement64(&g_apc_count);
+	::ExReleaseRundownProtection(&g_rundown_protection);
 }

@@ -8,7 +8,7 @@
 #include "undocumented_imports.h"
 #include "injected_shellcode.h"
 
-extern volatile LONG64 g_apc_count;
+extern EX_RUNDOWN_REF g_rundown_protection;
 
 namespace apc_routines
 {

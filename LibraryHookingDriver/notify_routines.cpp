@@ -42,22 +42,22 @@ void notify_routines::create_thread(HANDLE process_id, HANDLE thread_id, BOOLEAN
 			nullptr
 		);
 
-		::InterlockedIncrement64(&g_apc_count);
+		if (::ExAcquireRundownProtection(&g_rundown_protection)) {
+			auto inserted = ::KeInsertQueueApc(
+				apc,
+				nullptr,
+				nullptr,
+				0
+			);
 
-		auto inserted = ::KeInsertQueueApc(
-			apc,
-			nullptr,
-			nullptr,
-			0
-		);
+			if (!inserted) {
+				delete apc;
+				::ExReleaseRundownProtection(&g_rundown_protection);
 
-		if (!inserted) {
-			delete apc;
-			::InterlockedDecrement64(&g_apc_count);
+				KdPrint(("[-] Could not insert a kernel APC.\n"));
 
-			KdPrint(("[-] Could not insert a kernel APC.\n"));
-
-			return;
+				return;
+			}
 		}
 	}
 }

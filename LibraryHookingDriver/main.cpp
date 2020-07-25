@@ -9,7 +9,7 @@
 void driver_unload(PDRIVER_OBJECT driver_object);
 
 NewProcessesList* g_new_processes_list = nullptr;
-volatile LONG64 g_apc_count = 0;
+EX_RUNDOWN_REF g_rundown_protection;
 
 extern "C" NTSTATUS DriverEntry(PDRIVER_OBJECT driver_object, PUNICODE_STRING)
 {
@@ -44,6 +44,8 @@ extern "C" NTSTATUS DriverEntry(PDRIVER_OBJECT driver_object, PUNICODE_STRING)
 		return status;
 	}
 
+	::ExInitializeRundownProtection(&g_rundown_protection);
+
 	KdPrint(("[+] Loaded LibraryHookingDriver successfully.\n"));
 
 	return STATUS_SUCCESS;
@@ -56,7 +58,7 @@ void driver_unload(PDRIVER_OBJECT)
 
 	delete g_new_processes_list;
 
-	while (g_apc_count > 0);
+	::ExWaitForRundownProtectionRelease(&g_rundown_protection);
 
 	KdPrint(("[+] Unloaded LibraryHookingDriver successfully.\n"));
 }
