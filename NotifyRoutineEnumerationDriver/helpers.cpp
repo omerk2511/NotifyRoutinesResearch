@@ -73,7 +73,7 @@ undocumented::PSP_CALLBACK_OBJECT** helpers::find_PspCreateThreadNotifyRoutine()
 	auto nt_headers = reinterpret_cast<PIMAGE_NT_HEADERS>(pe_base + dos_header->e_lfanew);
 
 	auto current_section_header = reinterpret_cast<PIMAGE_SECTION_HEADER>(
-		pe_base + sizeof(IMAGE_DOS_HEADER) + sizeof(ULONG) +
+		reinterpret_cast<char*>(nt_headers) + sizeof(ULONG) +
 		sizeof(IMAGE_FILE_HEADER) + nt_headers->FileHeader.SizeOfOptionalHeader);
 
 	char data_section_name[] = ".data";
