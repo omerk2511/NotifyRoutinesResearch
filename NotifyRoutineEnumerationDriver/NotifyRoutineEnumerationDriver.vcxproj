@@ -221,9 +221,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Inf Include="NotifyRoutineEnumerationDriver.inf" />
-  </ItemGroup>
-  <ItemGroup>
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>

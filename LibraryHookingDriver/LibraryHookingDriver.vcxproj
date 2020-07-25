@@ -173,9 +173,6 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Inf Include="LibraryHookingDriver.inf" />
-  </ItemGroup>
-  <ItemGroup>
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>

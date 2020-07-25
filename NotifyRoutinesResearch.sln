@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LibraryHookingDll", "Librar
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NotifyRoutineEnumerationDriver", "NotifyRoutineEnumerationDriver\NotifyRoutineEnumerationDriver.vcxproj", "{F7571916-AA8A-46B7-B04C-13FF5E2B9D64}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NotifyRoutineHookingDriver", "NotifyRoutineHookingDriver\NotifyRoutineHookingDriver.vcxproj", "{8D1D7409-B346-4208-88FD-EFBFF67FCF37}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -121,6 +123,30 @@ Global
 		{F7571916-AA8A-46B7-B04C-13FF5E2B9D64}.Release|x86.ActiveCfg = Release|Win32
 		{F7571916-AA8A-46B7-B04C-13FF5E2B9D64}.Release|x86.Build.0 = Release|Win32
 		{F7571916-AA8A-46B7-B04C-13FF5E2B9D64}.Release|x86.Deploy.0 = Release|Win32
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Debug|ARM.ActiveCfg = Debug|ARM
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Debug|ARM.Build.0 = Debug|ARM
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Debug|ARM.Deploy.0 = Debug|ARM
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Debug|ARM64.Build.0 = Debug|ARM64
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Debug|x64.ActiveCfg = Debug|x64
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Debug|x64.Build.0 = Debug|x64
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Debug|x64.Deploy.0 = Debug|x64
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Debug|x86.ActiveCfg = Debug|Win32
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Debug|x86.Build.0 = Debug|Win32
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Debug|x86.Deploy.0 = Debug|Win32
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Release|ARM.ActiveCfg = Release|ARM
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Release|ARM.Build.0 = Release|ARM
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Release|ARM.Deploy.0 = Release|ARM
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Release|ARM64.ActiveCfg = Release|ARM64
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Release|ARM64.Build.0 = Release|ARM64
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Release|ARM64.Deploy.0 = Release|ARM64
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Release|x64.ActiveCfg = Release|x64
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Release|x64.Build.0 = Release|x64
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Release|x64.Deploy.0 = Release|x64
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Release|x86.ActiveCfg = Release|Win32
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Release|x86.Build.0 = Release|Win32
+		{8D1D7409-B346-4208-88FD-EFBFF67FCF37}.Release|x86.Deploy.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

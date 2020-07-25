@@ -58,5 +58,5 @@ void driver_unload(PDRIVER_OBJECT)
 
 	while (g_apc_count > 0);
 
-	KdPrint(("[+] Unloaded RemoteThreadDetector successfully.\n"));
+	KdPrint(("[+] Unloaded LibraryHookingDriver successfully.\n"));
 }
