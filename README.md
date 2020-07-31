@@ -1,9 +1,9 @@
 # Notify Routines Research
 A research project about Windows notify routines.
 
-The full research paper is at:
-- English - TBD
-- Hebrew - TBD
+The full research paper is available in:
+- English (TBD)
+- [Hebrew](https://www.digitalwhisper.co.il/files/Zines/0x78/DW120-7-WinNotificationRoutine.pdf)
 
 ## Projects
 1. **Remote Thread Shellcode Injector** - A basic code injector which injects shellcode to a remote process using CreateRemoteThread.
